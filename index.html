@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Boron Readings</title>
+</head>
+<body>
+    <h1>Particle Boron Device Readings</h1>
+    <div id="data"></div>
+    <script>
+        // Sample Data - Replace with your actual data
+        const data = [
+            { timestamp: '2024-10-12T10:00:00Z', temperature: 22.5, humidity: 55 },
+            { timestamp: '2024-10-12T11:00:00Z', temperature: 23.0, humidity: 54 },
+        ];
+
+        const dataContainer = document.getElementById('data');
+        data.forEach(reading => {
+            const div = document.createElement('div');
+            div.innerHTML = `Time: ${reading.timestamp}, Temp: ${reading.temperature}°C, Humidity: ${reading.humidity}%`;
+            dataContainer.appendChild(div);
+        });
+    </script>
+</body>
+</html>
