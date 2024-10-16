@@ -4,38 +4,95 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weather Station Dashboard</title>
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #chart-container {
+      width: 80%;
+      margin: 50px auto;
+    }
+    canvas {
+      background-color: #f9f9f9;
+    }
+  </style>
 </head>
 <body>
-  <h1>Weather Station Data</h1>
-  <table id="weather-data">
-    <tr>
-      <th>Timestamp</th>
-      <th>Temperature</th>
-      <th>Humidity</th>
-      <th>Wind Speed</th>
-    </tr>
-  </table>
+  <h1>Weather Station Dashboard</h1>
+  <div id="chart-container">
+    <canvas id="weatherChart"></canvas>
+  </div>
 
   <script>
     // Google Sheets URL for published data
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1zEZqNFc38FfPbyxcI7plenRwFvp8te8BNc6xnaswdu8/gviz/tq?tqx=out:json';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:json';
 
-    // Fetch and display weather data
+    // Fetch data from Google Sheets and plot a graph
     fetch(sheetUrl)
       .then(response => response.text())
       .then(text => {
-        // Parse JSON from Google Sheets response
-        const json = JSON.parse(text.substring(47, text.length - 2));
-        const table = document.getElementById('weather-data');
+        const json = JSON.parse(text.substring(47, text.length - 2));  // Parse the JSON from Google Sheets
+        const rows = json.table.rows;  // Get the rows from the parsed data
 
-        // Loop through rows and append to table
-        json.table.rows.forEach(row => {
-          const newRow = table.insertRow();
-          row.c.forEach(cell => {
-            const newCell = newRow.insertCell();
-            newCell.textContent = cell ? cell.v : '';
-          });
+        const labels = [];
+        const tempData = [];
+
+        // Loop through the rows and get the last 60 entries
+        const last60Rows = rows.slice(-60);
+
+        last60Rows.forEach(row => {
+          const deviceId = row.c[0].v;  // Device ID (if needed)
+          const timestamp = row.c[1].v; // Timestamp
+          const tempString = row.c[2].v; // Temperature value in string format "{temp=62.6}"
+          
+          // Extract the temperature value from the string
+          const temp = parseFloat(tempString.match(/temp=(\d+(\.\d+)?)/)[1]);
+
+          // Add timestamp and temperature to arrays
+          labels.push(timestamp);
+          tempData.push(temp);
         });
+
+        // Create a chart using Chart.js
+        const ctx = document.getElementById('weatherChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,  // Timestamps
+            datasets: [{
+              label: 'Temperature (°F)',
+              data: tempData,  // Temperatures
+              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              borderWidth: 2,
+              fill: true
+            }]
+          },
+          options: {
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time'
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Temperature (°F)'
+                },
+                beginAtZero: false
+              }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching data: ", error);
       });
   </script>
 </body>
