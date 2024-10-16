@@ -4,42 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sheets Data Fetch</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        // Load the Google Charts library
-        google.charts.load('current', { packages: ['corechart', 'table'] });
-        
-        // Set a callback function to run when the library is ready
-        google.charts.setOnLoadCallback(drawTable);
+  window.onload = function() { init() };
 
-        function drawTable() {
-            // Google Sheet ID (replace with your actual Sheet ID)
-            var spreadsheetId = '1zEZqNFc38FfPbyxcI7plenRwFvp8te8BNc6xnaswdu8';
+  var public_spreadsheet_url = 'https://docs.google.com/spreadsheet/pub?hl=en_US&hl=en_US&key=0AmYzu_s7QHsmdDNZUzRlYldnWTZCLXdrMXlYQzVxSFE&output=html';
 
-            // URL of the published Google Sheets CSV data
-            var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/' + spreadsheetId + '/gviz/tq?sheet=Sheet1&headers=1');
-            
-            // Send query to Google Sheets and get data
-            query.send(handleQueryResponse);
-        }
+  function init() {
+    Tabletop.init( { key: public_spreadsheet_url,
+                     callback: showInfo,
+                     simpleSheet: true } )
+  }
 
-        function handleQueryResponse(response) {
-            // Check for errors
-            if (response.isError()) {
-                console.error('Error fetching data: ' + response.getMessage() + ' ' + response.getDetailedMessage());
-                return;
-            }
+  function showInfo(data, tabletop) {
+    alert("Successfully processed!")
+    console.log(data);
+  }
+</script>
 
-            // Get the data from the response
-            var data = response.getDataTable();
-
-            // Create a table and populate it with the data
-            var table = new google.visualization.Table(document.getElementById('table_div'));
-
-            // Draw the table
-            table.draw(data, { showRowNumber: true, width: '100%', height: 'auto' });
-        }
-    </script>
 </head>
 <body>
     <h1>Google Sheets Data</h1>
